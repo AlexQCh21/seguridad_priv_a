@@ -1,66 +1,58 @@
-# App de Seguridad y Privacidad
+# PRÁCTICA 15 - LABORATORIO - APLICACIONES MÓVILES
+# 🛡️ Análisis de Seguridad en la Aplicación Android
 
-Una aplicación Android que demuestra el manejo seguro de permisos y protección de datos personales.
+## 1.1 Identificación de Vulnerabilidades (2 puntos)
 
-## Características
+Análisis del archivo `DataProtectionManager.kt`.
 
-### Gestión de Permisos
-- **Cámara**: Captura de fotos con manejo seguro
-- **Galería**: Acceso a imágenes del dispositivo
-- **Micrófono**: Grabación de audio con permisos dinámicos
-- **Contactos**: Lectura segura de la lista de contactos
-- **Teléfono**: Funcionalidad de llamadas
-- **Ubicación**: Acceso a localización del usuario
+### 🔐 ¿Qué método de encriptación se utiliza para proteger datos sensibles?
+- `AES-256-GCM` para cifrar los valores (datos sensibles) almacenados.
+- `AES-256-SIV` para cifrar las claves (keys) de esos datos dentro de `EncryptedSharedPreferences`.
 
-### Seguridad y Privacidad
-- **Protección de Datos**: Sistema de logging encriptado
-- **Almacenamiento Seguro**: Base de datos SQLCipher
-- **Permisos Runtime**: Solicitud dinámica de permisos
-- **Política de Privacidad**: Información transparente sobre el uso de datos
+### ⚠️ Posibles vulnerabilidades en la implementación actual del logging
+- Almacenamiento de logs sin cifrado.
+- Acumulación ilimitada y concatenación de logs en un solo `String`.
 
-## Tecnologías Utilizadas
+### ❌ ¿Qué sucede si falla la inicialización del sistema de encriptación?
+- Se captura una excepción y se hace un fallback a `SharedPreferences` normales si falla la encriptación.
 
-- **Kotlin**: Lenguaje principal
-- **Android Jetpack**: Componentes modernos
-- **SQLCipher**: Encriptación de base de datos
-- **Camera2 API**: Manejo avanzado de cámara
-- **Security Crypto**: Encriptación de datos sensibles
+---
 
-## Instalación
+## 1.2 Permisos y Manifiesto (2 puntos)
 
-1. Clona el repositorio
-2. Abre el proyecto en Android Studio
-3. Sincroniza las dependencias
-4. Ejecuta en dispositivo o emulador
+Examen de `AndroidManifest.xml` y `MainActivity.kt`.
 
-## Estructura del Proyecto
+### 📋 Lista de permisos peligrosos declarados en el manifiesto:
+- `android.permission.CAMERA`
+- `android.permission.READ_EXTERNAL_STORAGE`
+- `android.permission.READ_MEDIA_IMAGES`
+- `android.permission.RECORD_AUDIO`
+- `android.permission.READ_CONTACTS`
+- `android.permission.CALL_PHONE`
+- `android.permission.SEND_SMS`
+- `android.permission.ACCESS_COARSE_LOCATION`
 
-```
-app/
-├── src/main/java/com/example/seguridad_priv_a/
-│   ├── MainActivity.kt                 # Pantalla principal
-│   ├── PermissionsApplication.kt       # Configuración global
-│   ├── data/
-│   │   ├── DataProtectionManager.kt    # Gestión de datos seguros
-│   │   └── PermissionItem.kt          # Modelo de permisos
-│   ├── adapter/
-│   │   └── PermissionsAdapter.kt      # Adaptador RecyclerView
-│   └── [Actividades individuales]
-└── res/
-    ├── layout/                        # Diseños XML
-    ├── values/                        # Recursos y strings
-    └── xml/                          # Configuraciones
-```
+### 🧩 Patrón utilizado para solicitar permisos en runtime:
+- Se utiliza el **Activity Result API**.
 
-## Permisos Requeridos
+### 🔒 Configuración de seguridad que previene backups automáticos:
+- `android:allowBackup="false"` en el archivo `AndroidManifest.xml`.
 
-- `CAMERA` - Para captura de fotos
-- `READ_MEDIA_IMAGES` - Acceso a galería
-- `RECORD_AUDIO` - Grabación de audio
-- `READ_CONTACTS` - Lectura de contactos
-- `CALL_PHONE` - Realizar llamadas
-- `ACCESS_COARSE_LOCATION` - Ubicación aproximada
+---
 
-## Licencia
+## 1.3 Gestión de Archivos (3 puntos)
 
-Este proyecto es para fines educativos y demostrativos.
+Revisión de `CameraActivity.kt` y `file_paths.xml`.
+
+### 📁 ¿Cómo se implementa la compartición segura de archivos de imágenes?
+- Se utiliza un `FileProvider`, que permite compartir archivos entre apps usando un URI seguro (`content://`) en lugar de exponer rutas directas (`file://`).
+
+### 🆔 Autoridad utilizada para el `FileProvider`:
+- `com.example.seguridad_priv_a.fileprovider`
+
+### 🚫 ¿Por qué no se debe usar URIs con `file://` directamente?
+Desde Android 7.0 (API 24), el uso de URIs `file://` para compartir archivos está prohibido y lanza una `FileUriExposedException`.
+
+Esto se debe a que:
+- Expone la ruta absoluta del archivo.
+- Puede permitir acceso no autorizado a archivos arbitrarios si otra app obtiene esa URI.
