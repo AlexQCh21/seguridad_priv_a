@@ -188,19 +188,3 @@ Esto se debe a que:
 
 ---
 
-## **Resumen de Clases y Funcionalidades**
-
-- **DataProtectionManager.kt**:  
-  Encriptación robusta, rotación de claves, HMAC, derivación con salt, logs de acceso.
-- **SecurityAuditManager.kt**:  
-  Auditoría, rate limiting, alertas, exportación de logs firmados.
-- **DataProtectionActivity.kt**:  
-  Autenticación biométrica, PIN, timeout.
-- **ZeroTrustManager.kt & SecuritySessionManager.kt**:  
-  Zero Trust, sesiones, privilegios mínimos, validación centralizada.
-- **AdvancedAnonymizer.kt**:  
-  Anonimización avanzada, k-anonymity, differential privacy, masking.
-- **ForensicManager.kt**:  
-  Forense, chain of custody, blockchain de logs, compliance, investigación.
-
-Todas estas implementaciones cumplen y demuestran los puntos requeridos en las partes 2 y 3 del proyecto.
